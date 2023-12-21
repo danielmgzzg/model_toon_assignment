@@ -10,8 +10,6 @@ components:
     executorLabel: exec-preparation-op
   comp-training-op:
     executorLabel: exec-training-op
-  comp-validation-op:
-    executorLabel: exec-validation-op
 deploymentSpec:
   executors:
     exec-evaluation-op:
@@ -19,31 +17,25 @@ deploymentSpec:
         command:
         - python
         - evaluation.py
-        image: model_toon_pipeline:tilt-342bce402979006b
+        image: model_toon_pipeline:tilt-05c834a521a876ab
     exec-extract-op:
       container:
         command:
         - python
         - extraction.py
-        image: model_toon_pipeline:tilt-342bce402979006b
+        image: model_toon_pipeline:tilt-05c834a521a876ab
     exec-preparation-op:
       container:
         command:
         - python
         - preparation.py
-        image: model_toon_pipeline:tilt-342bce402979006b
+        image: model_toon_pipeline:tilt-05c834a521a876ab
     exec-training-op:
       container:
         command:
         - python
         - training.py
-        image: model_toon_pipeline:tilt-342bce402979006b
-    exec-validation-op:
-      container:
-        command:
-        - python
-        - validation.py
-        image: model_toon_pipeline:tilt-342bce402979006b
+        image: model_toon_pipeline:tilt-05c834a521a876ab
 pipelineInfo:
   description: A Logistic Regression pipeline.
   name: model-toon-pipeline
@@ -72,7 +64,7 @@ root:
         componentRef:
           name: comp-preparation-op
         dependentTasks:
-        - validation-op
+        - extract-op
         taskInfo:
           name: preparation-op
       training-op:
@@ -84,14 +76,5 @@ root:
         - preparation-op
         taskInfo:
           name: training-op
-      validation-op:
-        cachingOptions:
-          enableCache: true
-        componentRef:
-          name: comp-validation-op
-        dependentTasks:
-        - extract-op
-        taskInfo:
-          name: validation-op
 schemaVersion: 2.1.0
 sdkVersion: kfp-2.4.0

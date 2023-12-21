@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: model-toon-pipeline-pod
+spec:
+  containers:
+    - name: model-toon-pipeline-container
+      image: model_toon_pipeline:latest
+      imagePullPolicy: IfNotPresent
+      command:
+        [
+          "/bin/sh",
+          "-c",
+          "while true; do echo 'Pod is running'; sleep 60; done",
+        ]
+  restartPolicy: Always

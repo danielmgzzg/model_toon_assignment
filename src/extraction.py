@@ -1,19 +1,32 @@
-import logging
-
-# Configure the logging
-logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s')
+import os
+import pandas as pd
+from utils.sqlite_handler import SQLiteHandler
 
 class Extraction:
-    def read_csv(self, path):
-        # logging message
-        logging.info(f"Reading the CSV from {path}")
+    def read_file(self, path, name):
+        db_file = os.path.join(path, f"{name}.db")
+        csv_file = os.path.join(path, f"{name}.csv")
 
-    def ensure_data_exists(self):
-        # Implementation here
-        pass
+        # Check if the CSV file exists
+        if not os.path.exists(csv_file):
+            raise FileNotFoundError(f"CSV file not found at {csv_file}")
 
+        # Initialize SQLiteHandler
+        sqlite_handler = SQLiteHandler(db_file, csv_file, name)
+        data_set = sqlite_handler.load_data()
 
-extractor = Extraction(); 
+        # Read CSV
+        try:
+            df = pd.read_csv(csv_file)
+            return df
+        except Exception as e:
+            print(f"Error reading the CSV file: {e}")
+            return None
 
-extractor.read_csv('path/to/data.csv');
+extractor = Extraction()
+df = extractor.read_file('data/', 'data_set')
+
+if df is not None:
+    print("Dataframe loaded successfully.")
+else:
+    print("Failed to load dataframe.")

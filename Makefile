@@ -1,4 +1,4 @@
-.PHONY: init install environment test clean build-pipeline deploy-pipeline tilt tilt-down
+.PHONY: init install environment test clean build-pipeline deploy-pipeline tilt tilt-down data
 include .env
 
 # Variables
@@ -21,6 +21,9 @@ install:
 		echo "Virtual environment not found. Please run 'make environment' first."; \
 	fi
 
+data:
+	./scripts/environment.sh $(PYTHON) -m dvc pull
+
 freeze:
 	@if [ -f "$(PYTHON)" ]; then \
 		$(PYTHON) -m pip freeze > requirements/$(ENV).txt; \
@@ -29,7 +32,7 @@ freeze:
 	fi
 
 # Create the virtual environment
-environment:
+environment: data
 	./scripts/environment.sh
 
 # Activate the virtual environment
@@ -38,7 +41,9 @@ activate:
 
 # Run tests
 test:
-	$(PYTHON) -m unittest discover -s $(PROJECT_NAME)/tests -p 'test*.py'
+	export PYTHONPATH=$$PYTHONPATH:"src" && \
+	echo $$PYTHONPATH && \
+	$(PYTHON) -m unittest discover -s tests -p 'test*.py'
 
 # Clean up pycache and temporary files
 clean:
@@ -47,7 +52,12 @@ clean:
 	find . -type d -name '__pycache__' -delete
 
 # Tilt up for rapid development
-tilt:
+tilt: 
+	GIT_REPO_URL=$(GIT_REPO_URL) \
+	GIT_TOKEN=$(GIT_TOKEN) \
+	AZURE_CLIENT_ID=$(AZURE_CLIENT_ID) \
+	AZURE_CLIENT_SECRET=$(AZURE_CLIENT_SECRET) \
+	AZURE_TENANT_ID=$(AZURE_TENANT_ID) \
 	tilt up
 
 # Tilt down to stop development environment
@@ -79,3 +89,14 @@ kubeflow-pipelines:
 fetch-kubeflow-manifests:
 	./scripts/fetch_kubeflow_manifests.sh $(PIPELINE_VERSION)
 
+azure-svc-acc:
+	az ad sp create-for-rbac --name "$(PROJECT_NAME)_service_account"
+
+azure-role-subscription:
+	az role assignment create --assignee $(AZURE_CLIENT_ID) --role Contributor --scope /subscriptions/$(AZURE_SUBSCRIPTION_ID)/resourceGroups/$(RESOURCE_GROUP)
+
+azure-role-storage:
+	az role assignment create --assignee $(AZURE_CLIENT_ID) --role "Storage Blob Data Contributor" --scope /subscriptions/$(AZURE_SUBSCRIPTION_ID)/resourceGroups/ml_toon_remote_storage/providers/Microsoft.Storage/storageAccounts/mltoonaccount/blobServices/default/containers/azmltooncontainer
+
+clean-pods:
+	kubectl delete pods --field-selector=status.phase=Succeeded --namespace kubeflow
