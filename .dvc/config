@@ -1,0 +1,5 @@
+[core]
+    remote = az-blob
+['remote "az-blob"']
+    url = azure://azmltooncontainer/
+    account_name = mltoonaccount
