@@ -11,8 +11,5 @@ COPY ./src /app
 COPY requirements/dev.txt /app/requirements.txt
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
-# Copy the scripts into the container
-COPY scripts/ /app/scripts/
-
-# Set a default command or entrypoint (e.g., a shell or a specific script)
-CMD ["bash"]
+# Set a default command or entrypoint (e.g., python or a specific script)
+ENTRYPOINT ["python"]

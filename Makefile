@@ -56,7 +56,10 @@ tilt-down:
 
 # Compile Kubeflow pipeline
 build-pipeline:
-	PIPELINE_NAME=$(PIPELINE_NAME) $(PYTHON) ./pipelines/compile_pipeline.py --output ./pipelines/$(PIPELINE_NAME).yaml
+	PIPELINE_NAME=$(PIPELINE_NAME) \
+	PIPELINE_TAG=$(PIPELINE_TAG) \
+	$(PYTHON) ./pipelines/compile_pipeline.py \
+	--output ./pipelines/$(PIPELINE_NAME).yaml
 
 # Deploy pipeline to Kubeflow
 deploy-pipeline:

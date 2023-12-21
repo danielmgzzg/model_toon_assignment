@@ -1,70 +1,29 @@
 # PIPELINE DEFINITION
 # Name: model-toon-pipeline
-# Description: A hello world pipeline.
-# Inputs:
-#    input_message: str
+# Description: A Logistic Regression pipeline.
 components:
-  comp-hello-world:
-    executorLabel: exec-hello-world
-    inputDefinitions:
-      parameters:
-        message:
-          parameterType: STRING
-    outputDefinitions:
-      parameters:
-        Output:
-          parameterType: STRING
+  comp-extract:
+    executorLabel: exec-extract
 deploymentSpec:
   executors:
-    exec-hello-world:
+    exec-extract:
       container:
-        args:
-        - --executor_input
-        - '{{$}}'
-        - --function_to_execute
-        - hello_world
         command:
-        - sh
-        - -c
-        - "\nif ! [ -x \"$(command -v pip)\" ]; then\n    python3 -m ensurepip ||\
-          \ python3 -m ensurepip --user || apt-get install python3-pip\nfi\n\nPIP_DISABLE_PIP_VERSION_CHECK=1\
-          \ python3 -m pip install --quiet --no-warn-script-location 'kfp==2.4.0'\
-          \ '--no-deps' 'typing-extensions>=3.7.4,<5; python_version<\"3.9\"' && \"\
-          $0\" \"$@\"\n"
-        - sh
-        - -ec
-        - 'program_path=$(mktemp -d)
-
-
-          printf "%s" "$0" > "$program_path/ephemeral_component.py"
-
-          _KFP_RUNTIME=true python3 -m kfp.dsl.executor_main                         --component_module_path                         "$program_path/ephemeral_component.py"                         "$@"
-
-          '
-        - "\nimport kfp\nfrom kfp import dsl\nfrom kfp.dsl import *\nfrom typing import\
-          \ *\n\ndef hello_world(message: str) -> str:\n    print(message)\n    return\
-          \ message\n\n"
-        image: python:3.8
+        - python
+        - extraction.py
+        image: model_toon_pipeline:tilt-52acb3906657560e
 pipelineInfo:
-  description: A hello world pipeline.
+  description: A Logistic Regression pipeline.
   name: model-toon-pipeline
 root:
   dag:
     tasks:
-      hello-world:
+      extract:
         cachingOptions:
           enableCache: true
         componentRef:
-          name: comp-hello-world
-        inputs:
-          parameters:
-            message:
-              componentInputParameter: input_message
+          name: comp-extract
         taskInfo:
-          name: hello-world
-  inputDefinitions:
-    parameters:
-      input_message:
-        parameterType: STRING
+          name: extract
 schemaVersion: 2.1.0
 sdkVersion: kfp-2.4.0
