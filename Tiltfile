@@ -6,7 +6,7 @@ pipeline_version = os.getenv('PIPELINE_VERSION', '2.0.5')
 # Get the image name from Kubernetes
 image_name_cmd = "kubectl get job model-toon-pipeline-init-job -o=jsonpath='{.spec.template.spec.containers[?(@.name==\"model-toon-pipeline-container\")].image}'"
 # Set this image name as an environment variable
-os.environ['PIPELINE_IMAGE_NAME'] = local(image_name_cmd, quiet=True)
+os.environ['PIPELINE_IMAGE_NAME'] = local(image_name_cmd, quiet=False)
 
 # Load Kubeflow Kubernetes deployment YAMLs
 k8s_yaml([
@@ -17,7 +17,11 @@ k8s_yaml([
 ])
 
 # Define Docker image to build from Dockerfile
-docker_build('model_toon_pipeline', '.', dockerfile='Dockerfile')
+docker_build(
+    'model_toon_pipeline', 
+    '.', 
+    dockerfile='Dockerfile',
+    )
 
 # Watch for changes in the pipeline directory
 watch_file('pipelines/*.py')
@@ -29,12 +33,17 @@ local_resource(
     ['./pipelines/compile_pipeline.py', './pipelines/model_toon_pipeline.py']
 )
 
+# Define services
+k8s_resource(
+    'ml-pipeline-ui', 
+    port_forwards='3000:3000'
+)
+
 # Set up a local resource to deploy the pipeline
 local_resource(
     'deploy-pipeline',
     'make deploy-pipeline',
-    ['./pipelines/{}.yaml'.format(pipeline_name), './pipelines/model_toon_pipeline.py']
+    ['./pipelines/{}.yaml'.format(pipeline_name), './pipelines/model_toon_pipeline.py'],
+    resource_deps=['ml-pipeline-ui']  # Ensure this runs after ml-pipeline-ui is ready
 )
 
-# Define services
-k8s_resource('ml-pipeline-ui', port_forwards='3000:3000')
