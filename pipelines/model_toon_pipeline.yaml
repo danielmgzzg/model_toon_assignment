@@ -17,25 +17,21 @@ deploymentSpec:
         command:
         - python
         - evaluation.py
-        image: model_toon_pipeline:tilt-05c834a521a876ab
     exec-extract-op:
       container:
         command:
         - python
         - extraction.py
-        image: model_toon_pipeline:tilt-05c834a521a876ab
     exec-preparation-op:
       container:
         command:
         - python
         - preparation.py
-        image: model_toon_pipeline:tilt-05c834a521a876ab
     exec-training-op:
       container:
         command:
         - python
         - training.py
-        image: model_toon_pipeline:tilt-05c834a521a876ab
 pipelineInfo:
   description: A Logistic Regression pipeline.
   name: model-toon-pipeline

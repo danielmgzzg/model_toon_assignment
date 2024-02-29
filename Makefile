@@ -22,11 +22,15 @@ install:
 	fi
 
 data:
-	./scripts/environment.sh $(PYTHON) -m dvc pull
+	$(PYTHON) -m dvc remote add -d az-blob azure://${AZURE_STORAGE_CONTAINER_NAME}
+	$(PYTHON) -m dvc remote modify --local az-blob account_name ${AZURE_STORAGE_ACCOUNT_NAME}
+	$(PYTHON) -m dvc remote modify --local az-blob tenant_id ${AZURE_TENANT_ID}
+	$(PYTHON) -m dvc remote modify --local az-blob client_id ${AZURE_CLIENT_ID}
+	$(PYTHON) -m dvc remote modify --local az-blob client_secret ${AZURE_CLIENT_SECRET}
 
 freeze:
 	@if [ -f "$(PYTHON)" ]; then \
-		$(PYTHON) -m pip freeze > requirements/$(ENV).txt; \
+		$(PYTHON) -m pip freeze > requirements/x.txt; \
 	else \
 		echo "Virtual environment not found. Please run 'make environment' first."; \
 	fi
@@ -54,8 +58,9 @@ clean:
 # Tilt up for rapid development
 tilt: 
 	GIT_REPO_URL=$(GIT_REPO_URL) \
-	GIT_TOKEN=$(GIT_TOKEN) \
 	AZURE_CLIENT_ID=$(AZURE_CLIENT_ID) \
+	AZURE_STORAGE_CONTAINER_NAME=${AZURE_STORAGE_CONTAINER_NAME} \
+	AZURE_STORAGE_ACCOUNT_NAME=${AZURE_STORAGE_ACCOUNT_NAME} \
 	AZURE_CLIENT_SECRET=$(AZURE_CLIENT_SECRET) \
 	AZURE_TENANT_ID=$(AZURE_TENANT_ID) \
 	tilt up

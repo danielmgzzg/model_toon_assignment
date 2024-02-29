@@ -4,3 +4,4 @@ matplotlib
 seaborn
 dvc
 kfp
+dvc[azure]

@@ -3,10 +3,11 @@ pipeline_name = os.getenv('PIPELINE_NAME')
 kubeflow_host = os.getenv('KUBEFLOW_HOST')
 pipeline_version = os.getenv('PIPELINE_VERSION', '2.0.5')
 git_repo_url = os.getenv('GIT_REPO_URL')
-git_token = os.getenv('GIT_TOKEN')
 azure_client_id = os.getenv('AZURE_CLIENT_ID')
 azure_client_secret = os.getenv('AZURE_CLIENT_SECRET')
 azure_tenant_id = os.getenv('AZURE_TENANT_ID')
+azure_storage_container_name = os.getenv('AZURE_STORAGE_CONTAINER_NAME')
+azure_storage_account_name = os.getenv('AZURE_STORAGE_ACCOUNT_NAME')
 
 # Load Kubeflow Kubernetes deployment YAMLs
 k8s_yaml([
@@ -26,10 +27,11 @@ docker_build(
     dockerfile='Dockerfile',
     build_args={
     'git_repo_url': git_repo_url, 
-    'git_token': git_token,
     'azure_client_id': azure_client_id,
     'azure_client_secret': azure_client_secret,
-    'azure_tenant_id': azure_tenant_id  
+    'azure_tenant_id': azure_tenant_id,
+    'azure_storage_container_name': azure_storage_container_name,
+    'azure_storage_account_name': azure_storage_account_name
         }
     )
 
@@ -37,10 +39,10 @@ docker_build(
 watch_file('pipelines/*.py')
 
 
-# Get the image name from Kubernetes
-image_name_cmd = "kubectl get job model-toon-pipeline-init-job -o=jsonpath='{.spec.template.spec.containers[?(@.name==\"model-toon-pipeline-container\")].image}'"
-# Set this image name as an environment variable
-os.environ['PIPELINE_IMAGE_NAME'] = local(image_name_cmd, quiet=False)
+# # Get the image name from Kubernetes
+# image_name_cmd = "kubectl get job model-toon-pipeline-init-job -o=jsonpath='{.spec.template.spec.containers[?(@.name==\"model-toon-pipeline-container\")].image}'"
+# # Set this image name as an environment variable
+# os.environ['PIPELINE_IMAGE_NAME'] = local(image_name_cmd, quiet=False)
 
 
 # On changes in the pipeline directory, run the pipeline update script
