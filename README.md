@@ -56,10 +56,16 @@ This command will delete the virtual environment and all its associated files.
 
 ### Azure Account Requirement
 
-To pull data from Azure Blob Storage, a valid Azure account is necessary. You can log in to your Azure account using the following command:
+To pull data from Azure Blob Storage, a valid Azure account is necessary. A `.env` files is needed with the following:
+That contains the service account detailed scoped to Azure Blob Storage for the project.
 
 ```bash
-az login
+GIT_REPO_URL=https://github.com/danielmgzzg/model_toon_assignment.git
+AZURE_CLIENT_ID=
+AZURE_CLIENT_SECRET=
+AZURE_TENANT_ID=
+AZURE_STORAGE_CONTAINER_NAME=
+AZURE_STORAGE_ACCOUNT_NAME=
 ```
 
 ### Data Set File
@@ -96,7 +102,7 @@ This project encompasses a comprehensive machine learning pipeline, offering a r
 
 2. **`install`**: This command is used to install the required packages for the project. It reads the `requirements.txt` file and installs all the listed packages.
 
-3. **`data`**: This command pulls the data required for the project. It uses Data Version Control (DVC) to fetch the data from the current `.dvc` files.
+3. **`data`**: This command adds the configuration and pulls the data required for the project. It uses Data Version Control (DVC) to fetch the data from the current `.dvc` files.
 
 4. **`environment`**: This command sets up the project environment. It creates a virtual environment and installs all the necessary packages.
 
@@ -107,8 +113,6 @@ This project encompasses a comprehensive machine learning pipeline, offering a r
 7. **`clean`**: This command cleans up the project by deleting the virtual environment and all its associated files. It's useful for resetting the project environment.
 
 ## Project Structure
-
-> Note it also includes the s
 
 ```toml
 ├── Makefile # Makefile commands
