@@ -22,11 +22,11 @@ k8s_yaml([
 
 # Define Docker image to build from Dockerfile
 docker_build(
-    'model_toon_pipeline', 
-    '.', 
+    'model_toon_pipeline',
+    '.',
     dockerfile='Dockerfile',
     build_args={
-    'git_repo_url': git_repo_url, 
+    'git_repo_url': git_repo_url,
     'azure_client_id': azure_client_id,
     'azure_client_secret': azure_client_secret,
     'azure_tenant_id': azure_tenant_id,
@@ -39,11 +39,12 @@ docker_build(
 watch_file('pipelines/*.py')
 
 
-# # Get the image name from Kubernetes
-# image_name_cmd = "kubectl get job model-toon-pipeline-init-job -o=jsonpath='{.spec.template.spec.containers[?(@.name==\"model-toon-pipeline-container\")].image}'"
+registry = "localhost:35147/"
+repo_name = 'model_toon_pipeline'
+image_tag_cmd = "docker images | grep %s | awk '{print $2}' | head -n 1" % repo_name
+tag = local(image_tag_cmd, quiet=False)
 # # Set this image name as an environment variable
-# os.environ['PIPELINE_IMAGE_NAME'] = local(image_name_cmd, quiet=False)
-
+os.environ['PIPELINE_IMAGE_NAME'] = registry + repo_name + ":" + str(tag)
 
 # On changes in the pipeline directory, run the pipeline update script
 local_resource(
@@ -54,7 +55,7 @@ local_resource(
 
 # Define services
 k8s_resource(
-    'ml-pipeline-ui', 
+    'ml-pipeline-ui',
     port_forwards='3000:3000'
 )
 
