@@ -4,10 +4,8 @@
 components:
   comp-evaluation-op:
     executorLabel: exec-evaluation-op
-  comp-extract-op:
-    executorLabel: exec-extract-op
-  comp-preparation-op:
-    executorLabel: exec-preparation-op
+  comp-preprocess-op:
+    executorLabel: exec-preprocess-op
   comp-training-op:
     executorLabel: exec-training-op
 deploymentSpec:
@@ -17,25 +15,19 @@ deploymentSpec:
         command:
         - python
         - evaluation.py
-        image: localhost:35147/model_toon_pipeline:tilt-c254d6f952be93f7
-    exec-extract-op:
+        image: localhost:35147/model_toon_pipeline:tilt-f565c7fcaa3d9579
+    exec-preprocess-op:
       container:
         command:
         - python
-        - extraction.py
-        image: localhost:35147/model_toon_pipeline:tilt-c254d6f952be93f7
-    exec-preparation-op:
-      container:
-        command:
-        - python
-        - preparation.py
-        image: localhost:35147/model_toon_pipeline:tilt-c254d6f952be93f7
+        - preprocess.py
+        image: localhost:35147/model_toon_pipeline:tilt-f565c7fcaa3d9579
     exec-training-op:
       container:
         command:
         - python
         - training.py
-        image: localhost:35147/model_toon_pipeline:tilt-c254d6f952be93f7
+        image: localhost:35147/model_toon_pipeline:tilt-f565c7fcaa3d9579
 pipelineInfo:
   description: A Logistic Regression pipeline.
   name: model-toon-pipeline
@@ -51,29 +43,20 @@ root:
         - training-op
         taskInfo:
           name: evaluation-op
-      extract-op:
+      preprocess-op:
         cachingOptions:
           enableCache: true
         componentRef:
-          name: comp-extract-op
+          name: comp-preprocess-op
         taskInfo:
-          name: extract-op
-      preparation-op:
-        cachingOptions:
-          enableCache: true
-        componentRef:
-          name: comp-preparation-op
-        dependentTasks:
-        - extract-op
-        taskInfo:
-          name: preparation-op
+          name: preprocess-op
       training-op:
         cachingOptions:
           enableCache: true
         componentRef:
           name: comp-training-op
         dependentTasks:
-        - preparation-op
+        - preprocess-op
         taskInfo:
           name: training-op
 schemaVersion: 2.1.0

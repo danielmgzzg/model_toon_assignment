@@ -73,6 +73,7 @@ iterative-telemetry==0.0.8
 jmespath==1.0.1
 joblib==1.3.2
 kfp==2.4.0
+kfp-kubernetes==1.0.0
 kfp-pipeline-spec==0.2.2
 kfp-server-api==2.0.5
 kiwisolver==1.4.5

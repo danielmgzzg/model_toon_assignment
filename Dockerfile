@@ -37,7 +37,7 @@ COPY ./src /app
 COPY requirements/dev.txt /app/requirements.txt
 RUN pip install --trusted-host pypi.python.org -r requirements.txt
 
-RUN  dvc remote add -d -f az-blob azure://$AZURE_STORAGE_CONTAINER_NAME 
+RUN  dvc remote add -d -f az-blob azure://$AZURE_STORAGE_CONTAINER_NAME
 RUN  dvc remote modify --local az-blob account_name $AZURE_STORAGE_ACCOUNT_NAME
 RUN  dvc remote modify --local az-blob tenant_id $AZURE_TENANT_ID
 RUN  dvc remote modify --local az-blob client_id $AZURE_CLIENT_ID

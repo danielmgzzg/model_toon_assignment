@@ -2,7 +2,9 @@ import os
 import pandas as pd
 from utils.sqlite_handler import SQLiteHandler
 
+
 class Extraction:
+
     def read_file(self, path, name):
         db_file = os.path.join(path, f"{name}.db")
         csv_file = os.path.join(path, f"{name}.csv")
@@ -22,6 +24,7 @@ class Extraction:
         except Exception as e:
             print(f"Error reading the CSV file: {e}")
             return None
+
 
 extractor = Extraction()
 df = extractor.read_file('data/', 'data_set')

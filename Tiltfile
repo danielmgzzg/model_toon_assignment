@@ -14,7 +14,7 @@ k8s_yaml([
     'deployments/kubeflow/namespace.yaml',
     'deployments/kubeflow/pipelines.yaml',
     # To avoid unused image warnings, we need to load a Kubernetes YAML using it in a job
-    'deployments/kubeflow/model-toon-init.yaml',
+    # 'deployments/kubeflow/model-toon-init.yaml',
     # To debug in the container
     'deployments/kubeflow/model-toon-debug.yaml',
 
@@ -44,13 +44,12 @@ repo_name = 'model_toon_pipeline'
 image_tag_cmd = "docker images | grep %s | awk '{print $2}' | head -n 1" % repo_name
 tag = local(image_tag_cmd, quiet=False)
 # # Set this image name as an environment variable
-os.environ['PIPELINE_IMAGE_NAME'] = registry + repo_name + ":" + str(tag)
+os.environ['PIPELINE_IMAGE_NAME'] = registry + repo_name + ":" + str(tag).strip()
 
-# On changes in the pipeline directory, run the pipeline update script
 local_resource(
     'build-pipeline',
     'make build-pipeline',
-    ['./pipelines/compile_pipeline.py', './pipelines/model_toon_pipeline.py']
+    ['./pipelines/compile_pipeline.py', './pipelines/model_toon_pipeline.py', 'model_toon_pipeline']
 )
 
 # Define services

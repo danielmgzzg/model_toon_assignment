@@ -30,7 +30,7 @@ data:
 
 freeze:
 	@if [ -f "$(PYTHON)" ]; then \
-		$(PYTHON) -m pip freeze > requirements/x.txt; \
+		$(PYTHON) -m pip freeze > requirements/$(ENV).txt; \
 	else \
 		echo "Virtual environment not found. Please run 'make environment' first."; \
 	fi
@@ -56,7 +56,8 @@ clean:
 	find . -type d -name '__pycache__' -delete
 
 # Tilt up for rapid development
-tilt: 
+tilt:
+	PIPELINE_NAME=$(PIPELINE_NAME) \
 	GIT_REPO_URL=$(GIT_REPO_URL) \
 	AZURE_CLIENT_ID=$(AZURE_CLIENT_ID) \
 	AZURE_STORAGE_CONTAINER_NAME=${AZURE_STORAGE_CONTAINER_NAME} \
