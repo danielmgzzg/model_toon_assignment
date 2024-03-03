@@ -1,6 +1,9 @@
 import os
 import kfp
 import uuid
+import tempfile
+from kfp.compiler import Compiler
+from model_toon_pipeline import pipeline
 
 # Upload and deploy the pipeline to Kubeflow
 # Define your pipeline
@@ -13,11 +16,12 @@ def deploy_pipeline():
     # Connect to the Kubeflow Pipelines server
     client = kfp.Client(host=KUBEFLOW_HOST)
 
-    # Get the directory of the current script
-    script_dir = os.path.dirname(os.path.realpath(__file__))
-
     # Define the output filename
-    output_file = os.path.join(script_dir, f"{PIPELINE_NAME}.yaml")
+    with tempfile.NamedTemporaryFile(suffix='.yaml', delete=False) as tmp:
+        Compiler().compile(pipeline, package_path=tmp.name)
+        output_file = tmp.name
+
+    print(f"Pipeline compiled successfully: {output_file}")
 
     # Check if the pipeline already exists
     existing_pipelines = client.list_pipelines().pipelines
@@ -32,15 +36,23 @@ def deploy_pipeline():
             pipeline_version_name=f"{PIPELINE_NAME}_{uuid.uuid4().hex[:6]}",
             pipeline_id=existing_pipeline.pipeline_id)
         print(
-            f"Pipeline {PIPELINE_NAME} updated successfully: {updated_pipeline.display_name}"
+            "Pipeline "
+            f"{PIPELINE_NAME} "
+            "updated successfully: "
+            f"{updated_pipeline.display_name}"
         )
     else:
         # Create a new pipeline
         client.upload_pipeline(pipeline_package_path=output_file,
                                pipeline_name=PIPELINE_NAME)
         print(
-            f"Pipeline {PIPELINE_NAME} created successfully: {updated_pipeline.display_name}"
+            "Pipeline "
+            f"{PIPELINE_NAME} "
+            "created successfully: "
+            f"{updated_pipeline.display_name}"
         )
+    # delete the temporary file
+    os.remove(output_file)
 
 
 if __name__ == '__main__':

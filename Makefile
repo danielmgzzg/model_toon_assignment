@@ -8,7 +8,7 @@ PYTHON=${VENV_NAME}/bin/python
 ENV=dev
 PIPELINE_NAME?=model_toon_pipeline
 PIPELINE_VERSION?=2.0.5
-
+PIPELINE_IMAGE_NAME=$(shell ./scripts/get_image_tag.sh $(REGISTRY) $(PIPELINE_NAME) | tail -n 1)
 
 # Install dependencies
 install:
@@ -60,6 +60,9 @@ minikube-init:
 minikube-start:
 	minikube start
 
+get-image-tag:
+	./scripts/get_image_tag.sh $(REGISTRY) $(PIPELINE_NAME)
+
 build:
 	docker  build  . --tag $(PROJECT_NAME):latest  \
 	--build-arg git_repo_url=$(GIT_REPO_URL)  \
@@ -84,16 +87,18 @@ tilt:
 tilt-down:
 	tilt down
 
+get-image-tag:
+	./scripts/get_image_tag.sh $(REGISTRY) $(PIPELINE_NAME)
+
 # Compile Kubeflow pipeline (Used by Tilt)
 build-pipeline:
-	PIPELINE_IMAGE_NAME=$(shell ./scripts/get_image_tag.sh $(REGISTRY) $(PIPELINE_NAME) | tail -n 1) \
+	PIPELINE_IMAGE_NAME=$(PIPELINE_IMAGE_NAME) \
 	PIPELINE_NAME=$(PIPELINE_NAME) \
-	PIPELINE_TAG=$(PIPELINE_TAG) \
-	$(PYTHON) ./pipelines/compile_pipeline.py \
-	--output ./pipelines/$(PIPELINE_NAME).yaml
+	$(PYTHON) ./pipelines/compile_pipeline.py
 
 # Deploy pipeline to Kubeflow (Used by Tilt)
 deploy-pipeline:
+	PIPELINE_IMAGE_NAME=$(PIPELINE_IMAGE_NAME) \
 	PIPELINE_NAME=$(PIPELINE_NAME) \
 	KUBEFLOW_HOST=$(KUBEFLOW_HOST) \
 	$(PYTHON) ./pipelines/deploy_pipeline.py

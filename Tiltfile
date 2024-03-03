@@ -43,8 +43,10 @@ local_resource(
     'make build-pipeline',
     ['./pipelines/compile_pipeline.py',
      './pipelines/model_toon_pipeline.py',
-     './src'],
-    resource_deps=['model_toon_pipeline']
+     './src'
+     ],
+     labels=['model-toon-pipeline'],
+
 )
 
 # Define services
@@ -53,17 +55,22 @@ k8s_resource(
     port_forwards='3000:3000'
 )
 
+k8s_resource(
+    'model-toon-pipeline-pod',
+    labels=['model-toon-pipeline']
+)
+
 # Set up a local resource to deploy the pipeline
 local_resource(
     'deploy-pipeline',
     'make deploy-pipeline',
     ['./pipelines/{}.yaml'.format(pipeline_name),
      './pipelines/model_toon_pipeline.py',
-     './src',
-     '',
+    #  './src',
      'build-pipeline',
      ],
      resource_deps=['ml-pipeline-ui',
-     'model_toon_pipeline'] # Ensure this runs after ml-pipeline-ui is ready
+     'model_toon_pipeline'],
+     labels=['model-toon-pipeline']
 )
 

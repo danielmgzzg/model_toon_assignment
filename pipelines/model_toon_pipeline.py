@@ -3,6 +3,7 @@ from kfp import dsl
 
 PIPELINE_NAME = os.getenv('PIPELINE_NAME')
 PIPELINE_IMAGE_NAME = os.getenv('PIPELINE_IMAGE_NAME')
+print(f"PIPELINE_IMAGE_NAME: {PIPELINE_IMAGE_NAME}")
 
 
 @dsl.container_component
