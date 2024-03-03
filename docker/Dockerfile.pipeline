@@ -1,0 +1,7 @@
+FROM model_toon:latest
+
+COPY ./src /app
+
+RUN  dvc pull
+
+ENTRYPOINT ["python"]

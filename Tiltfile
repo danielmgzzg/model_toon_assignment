@@ -13,10 +13,9 @@ azure_storage_account_name = os.getenv('AZURE_STORAGE_ACCOUNT_NAME')
 k8s_yaml([
     'deployments/kubeflow/namespace.yaml',
     'deployments/kubeflow/pipelines.yaml',
-    # To avoid unused image warnings, we need to load a Kubernetes YAML using it in a job
-    # 'deployments/kubeflow/model-toon-init.yaml',
+    # To avoid unused image warnings, we need to load a Kubernetes YAML use it
     # To debug in the container
-    'deployments/kubeflow/model-toon-debug.yaml',
+    'deployments/model-toon-pod.yaml',
 
 ])
 
@@ -24,7 +23,7 @@ k8s_yaml([
 docker_build(
     'model_toon_pipeline',
     '.',
-    dockerfile='Dockerfile',
+    dockerfile='docker/Dockerfile.pipeline',
     build_args={
     'git_repo_url': git_repo_url,
     'azure_client_id': azure_client_id,
@@ -39,17 +38,13 @@ docker_build(
 watch_file('pipelines/*.py')
 
 
-registry = "localhost:35147/"
-repo_name = 'model_toon_pipeline'
-image_tag_cmd = "docker images | grep %s | awk '{print $2}' | head -n 1" % repo_name
-tag = local(image_tag_cmd, quiet=False)
-# # Set this image name as an environment variable
-os.environ['PIPELINE_IMAGE_NAME'] = registry + repo_name + ":" + str(tag).strip()
-
 local_resource(
     'build-pipeline',
     'make build-pipeline',
-    ['./pipelines/compile_pipeline.py', './pipelines/model_toon_pipeline.py', 'model_toon_pipeline']
+    ['./pipelines/compile_pipeline.py',
+     './pipelines/model_toon_pipeline.py',
+     './src'],
+    resource_deps=['model_toon_pipeline']
 )
 
 # Define services
@@ -62,7 +57,13 @@ k8s_resource(
 local_resource(
     'deploy-pipeline',
     'make deploy-pipeline',
-    ['./pipelines/{}.yaml'.format(pipeline_name), './pipelines/model_toon_pipeline.py'],
-    resource_deps=['ml-pipeline-ui']  # Ensure this runs after ml-pipeline-ui is ready
+    ['./pipelines/{}.yaml'.format(pipeline_name),
+     './pipelines/model_toon_pipeline.py',
+     './src',
+     '',
+     'build-pipeline',
+     ],
+     resource_deps=['ml-pipeline-ui',
+     'model_toon_pipeline'] # Ensure this runs after ml-pipeline-ui is ready
 )
 

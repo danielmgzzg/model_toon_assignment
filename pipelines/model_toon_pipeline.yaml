@@ -15,19 +15,19 @@ deploymentSpec:
         command:
         - python
         - evaluation.py
-        image: localhost:35147/model_toon_pipeline:tilt-f565c7fcaa3d9579
+        image: localhost:35147/model_toon_pipeline:tilt-fa276c6d22a34dc6
     exec-preprocess-op:
       container:
         command:
         - python
         - preprocess.py
-        image: localhost:35147/model_toon_pipeline:tilt-f565c7fcaa3d9579
+        image: localhost:35147/model_toon_pipeline:tilt-fa276c6d22a34dc6
     exec-training-op:
       container:
         command:
         - python
         - training.py
-        image: localhost:35147/model_toon_pipeline:tilt-f565c7fcaa3d9579
+        image: localhost:35147/model_toon_pipeline:tilt-fa276c6d22a34dc6
 pipelineInfo:
   description: A Logistic Regression pipeline.
   name: model-toon-pipeline
