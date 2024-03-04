@@ -12,6 +12,7 @@ if __name__ == "__main__":
     data_preprocessor = DataPreprocessor(data_set)
     preprocessed_dataset = data_preprocessor.preprocess_data()
 
+    preprocessed_dataset.split_data()
     if preprocessed_dataset is not None:
         logger.info("Dataset preprocessed successfully.")
     else:
