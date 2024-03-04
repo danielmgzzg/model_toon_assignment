@@ -1,5 +1,5 @@
-import os
-# import pandas as pd
+import argparse
+import pandas as pd
 
 from utils.logging_config import configure_logger
 
@@ -16,14 +16,22 @@ class Training:
         logger.info("Dataframe is loaded and ready for training.")
 
 
-training = Training()
+if __name__ == "__main__":
 
-csv_file = os.path.join('data/', 'processed_data_set.csv')
+    training = Training()
 
-# if not os.path.exists(csv_file):
-#     raise FileNotFoundError(logger.error("CSV file not found at {csv_file}"))
-# else:
-#     logger.info(f"Preprocessed CSV file found at {csv_file}")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--input_data",
+                        type=str,
+                        help="Path to the preprocessed data")
+    args = parser.parse_args()
 
-#     df = pd.read_csv(csv_file)
-#     training.train_model(df)
+    if not args.input_data:
+        error_msg = f"CSV file not found at {args.input_data}"
+        logger.error(error_msg)
+        raise FileNotFoundError(error_msg)
+    else:
+        logger.info(f"Preprocessed CSV file found at {args.input_data}")
+        df = pd.read_csv(args.input_data)
+        training = Training()
+        training.train_model(df)

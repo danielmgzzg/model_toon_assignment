@@ -1,12 +1,15 @@
-import logging
+from utils.logging_config import configure_logger
 
-# Configure the logging
-logging.basicConfig(level=logging.INFO,
-                        format='%(asctime)s - %(levelname)s - %(message)s')
+logger = configure_logger(__name__)
+
 
 class Evaluation:
+
     def evaluate_model(self, model):
         # Implementation here
-        logging.info("Model evaluated")
+        logger.info("Model evaluated")
 
-evaluation = Evaluation();
+
+if __name__ == "__main__":
+
+    evaluation = Evaluation()

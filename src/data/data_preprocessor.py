@@ -1,4 +1,5 @@
 import pandas as pd
+import argparse
 
 from .data_frame_preprocessor import DataFramePreprocessor
 from utils.logging_config import configure_logger
@@ -47,8 +48,15 @@ class DataPreprocessor:
 
         logger.debug("Data preprocessing completed.")
 
-        self.df_processor.save_data_to_csv("data/", "preprocessed_data_set")
-        logger.info("Preprocessed data saved to data/preprocessed_data_set.csv")
+        parser = argparse.ArgumentParser()
+        parser.add_argument('--output_data',
+                            type=str,
+                            help='Path for the output dataset')
+        args = parser.parse_args()
+
+        self.df_processor.save_data_to_csv(args.output_data)
+        logger.info(
+            "Preprocessed data saved to data/preprocessed_data_set.csv")
         return self.df_processor.df
 
     def get_columns_of_type(self, dtype):

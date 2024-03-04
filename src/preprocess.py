@@ -1,13 +1,18 @@
 from data.data_loader import DataLoader
 from data.data_preprocessor import DataPreprocessor
+from utils.logging_config import configure_logger
 
-data_loader = DataLoader()
-data_set = data_loader.load_data('data/', 'data_set')
+logger = configure_logger(__name__)
 
-data_preprocessor = DataPreprocessor(data_set)
-preprocessed_dataset = data_preprocessor.preprocess_data()
+if __name__ == "__main__":
 
-if preprocessed_dataset is not None:
-    print("Dataset preprocessed successfully.")
-else:
-    print("Failed to preprocess dataset.")
+    data_loader = DataLoader()
+    data_set = data_loader.load_data('data/', 'data_set')
+
+    data_preprocessor = DataPreprocessor(data_set)
+    preprocessed_dataset = data_preprocessor.preprocess_data()
+
+    if preprocessed_dataset is not None:
+        logger.info("Dataset preprocessed successfully.")
+    else:
+        logger.info("Failed to preprocess dataset.")

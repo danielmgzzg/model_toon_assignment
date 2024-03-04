@@ -3,24 +3,31 @@ from kfp import dsl
 
 PIPELINE_NAME = os.getenv('PIPELINE_NAME')
 PIPELINE_IMAGE_NAME = os.getenv('PIPELINE_IMAGE_NAME')
-print(f"PIPELINE_IMAGE_NAME: {PIPELINE_IMAGE_NAME}")
 
 
 @dsl.container_component
-def preprocess_op():
+def preprocess_op(output_data: dsl.Output[dsl.Dataset],
+                  # output_data_path: dsl.OutputPath(str)
+                  ):
     # Executes the extraction.py script
-    return dsl.ContainerSpec(
-        image=PIPELINE_IMAGE_NAME,
-        command=['python', 'preprocess.py'],
-    )
+    return dsl.ContainerSpec(image=PIPELINE_IMAGE_NAME,
+                             command=['python', 'preprocess.py'],
+                             args=[
+                                 '--output_data',
+                                 f"{output_data.path}",
+                             ])
 
 
 @dsl.container_component
-def training_op():
+def training_op(input_data: dsl.Input[dsl.Dataset]):
     # Executes the extraction.py script
     return dsl.ContainerSpec(
         image=PIPELINE_IMAGE_NAME,
         command=['python', 'training.py'],
+        args=[
+            '--input_data',
+            f"{input_data.path}",
+        ]
     )
 
 
@@ -39,7 +46,8 @@ def pipeline():
 
     preprocess_task = preprocess_op()
 
-    training_task = training_op()
+    training_task = training_op(
+        input_data=preprocess_task.outputs['output_data'])
     training_task.after(preprocess_task)
 
     evaluation_task = evaluation_op()

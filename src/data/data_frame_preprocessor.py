@@ -99,7 +99,7 @@ class DataFramePreprocessor:
         self.df.columns = self.df.columns.str.lower().str.replace(
             ' ', '_').str.replace('[^a-z0-9_]', '').str.replace('-', '_')
 
-    def save_data_to_csv(self, path, file_name):
+    def save_data_to_csv(self, path):
         """
         This method saves the DataFrame to a CSV file.
         Args:
@@ -108,9 +108,7 @@ class DataFramePreprocessor:
         Returns:
             None
         """
-        csv_file = os.path.join(path, f"{file_name}.csv")
-
-        logger.info(f"Saving DataFrame to {csv_file}.")
-        self.df.to_csv(csv_file, index=False)
+        logger.info(f"Saving DataFrame to {path}")
+        self.df.to_csv(path, index=False)
         logger.info("DataFrame saved successfully.")
-        return file_name
+        return path
